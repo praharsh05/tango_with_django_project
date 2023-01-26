@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rango',
+    'rango',#added as we created an app rango
 ]
 
 MIDDLEWARE = [

@@ -2,8 +2,12 @@ from django.db import models
 
 # Create your models here.
 
+#adding Category model which will create Category table as well as Page table
 class Category(models.Model):
     name= models.CharField(max_length=128, unique=True)
+
+    class Meta:
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name

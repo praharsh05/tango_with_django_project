@@ -2,8 +2,9 @@ from django.shortcuts import render  # to render pages
 from django.http import HttpResponse  # to send httpResponse to requests
 from rango.models import Category # to import the categories set in the model
 from rango.models import Page
-from rango.forms import CategoryForm
+from rango.forms import CategoryForm, PageForm
 from django.shortcuts import redirect
+from django.urls import reverse
 
 
 def index(request):
@@ -70,3 +71,29 @@ def add_category(request):
     # Will handle the bad form, new form, or no form supplied cases.
     # Render the form with error messages (if any).
     return render(request, 'rango/add_category.html', {'form': form})
+
+def add_page(request, category_name_slug):
+    try:
+        category = Category.objects.get(slug=category_name_slug)
+    except Category.DoesNotExist:
+        category = None
+
+    if category is None:
+        return redirect('/rango')
+
+    form =PageForm()
+
+    if request.method == 'POST':
+        form = PageForm(request.POST)
+        if form.is_valid():
+            if category:
+                page=form.save(commit=False)
+                page.category=category
+                page.view = 0
+                page.save()
+
+                return redirect(reverse('rango:show_category', kwargs={'category_name_slug': category_name_slug}))
+    else:
+        print(form.errors)
+    context_dict={'form': form, 'category': category}
+    return render(request, 'rango/add_page.html', context= context_dict)

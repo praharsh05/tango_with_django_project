@@ -2,7 +2,7 @@ from django.shortcuts import render  # to render pages
 from django.http import HttpResponse  # to send httpResponse to requests
 from rango.models import Category # to import the categories set in the model
 from rango.models import Page
-from rango.forms import CategoryForm, PageForm
+from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -97,3 +97,59 @@ def add_page(request, category_name_slug):
         print(form.errors)
     context_dict={'form': form, 'category': category}
     return render(request, 'rango/add_page.html', context= context_dict)
+
+
+def register(request):
+    #a boolean value to tell the template if registration was successful
+    registered = False
+
+    #if HTTP POST we are interested in processing the data
+    if request.method == 'POST':
+        #attempt to grab info from raw form data, making use of both userform and userprofileform
+        user_form = UserForm(request.POST)
+        profile_form = UserProfileForm(request.POST)
+
+        #if the two forms are valid
+        if user_form.is_valid() and profile_form.is_valid():
+            #save the user's form data to DB
+            user = user_form.save()
+            #now we hash the password with the set_password method
+            #once hashed we can update the user object
+            user.set_password(user.password)
+            user.save()
+
+            #now sort out the userprofile instance
+            #since we need to set the user attributes ourselves,
+            # we set commit=False. this delays saving the model
+            # until we are ready to avoid integrity problems
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            #did the user provide a profile picture
+            #if so we need to get it from the input form and,
+            #put it in the UserProfile Model
+
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            #now save the UserProfile model instance
+            profile.save()
+
+            #update the boolean variable to indicate that template,
+            #registration was successful
+            registered=True
+        
+        else:
+            #invalid form or forms print problem on terminal
+            print(user_form.errors, profile_form.errors)
+    else:
+        #not a HTTP POST, so we render our form using ModelForm instances,
+        #these forms will be blanck and ready for user input
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+    
+    #render the template depending on the context
+    return render(request, 'rango/register.html', context={'user_form':user_form,
+                                                            'profile_form':profile_form,
+                                                            'registered':registered})

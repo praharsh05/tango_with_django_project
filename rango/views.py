@@ -5,7 +5,7 @@ from rango.models import Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
 
 
@@ -201,3 +201,12 @@ def user_login(request):
 @login_required
 def restricted(request):
     return HttpResponse("since you are logged in, you can see this text!")
+
+
+#using login_required decorator to ensure only those logged in can access the logout view
+@login_required
+def user_logout(request):
+    #since we know only user that are logged in can use this
+    logout(request)
+    #take the user back to the homepage
+    return redirect(reverse('rango:index'))

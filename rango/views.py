@@ -5,6 +5,7 @@ from rango.models import Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.contrib.auth import authenticate,login
 
 
 def index(request):
@@ -153,3 +154,44 @@ def register(request):
     return render(request, 'rango/register.html', context={'user_form':user_form,
                                                             'profile_form':profile_form,
                                                             'registered':registered})
+
+
+def user_login(request):
+    #if request is an HTTP POST , try to pull out the relavent info
+    if request.method =='POST':
+        # Gather the username and password provided by the user.
+        # This information is obtained from the login form.
+        # We use request.POST.get('<variable>') as opposed
+        # to request.POST['<variable>'], because the
+        # request.POST.get('<variable>') returns None if the
+        # value does not exist, while request.POST['<variable>']
+        # will raise a KeyError exception.
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        #use the Django machinery to check if the username and password
+        #combination is valid, a user object is returned if valid
+        user = authenticate(username = username, password = password)
+
+        # If we have a User object, the details are correct.
+        # If None (Python's way of representing the absence of a value), no user
+        # with matching credentials was found.
+        if user:
+            #is the account active? it could have been disabled
+            if user.is_active:
+                #if the account is valid and active we can log the user in
+                #we will send the user back to homepage
+                login(request,user)
+                return redirect(reverse('rango:index'))
+            else:
+                #an inactive account was used - no longer loging in
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+            #bad login details were provided, so we can't log user in
+            print(f"Invalid user details: {username}, {password}")
+            return HttpResponse("Invalid login details supplied.")
+    #the request is not an HTTP POST so return a login form
+    #this is most likly HTTP GET
+    else:
+        #no context variable to pass to the template system hence blank dict
+        return render(request, 'rango/login.html')

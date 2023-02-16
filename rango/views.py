@@ -31,7 +31,7 @@ def index(request):
     
     #call the helper function to handle the cookies
     visitor_cookie_handler(request)
-    context_dict['visits'] = int(request.session['visits'])
+    # context_dict['visits'] = int(request.session['visits'])
     #obtain our Response object early so we can add cookie information
     response = render(request,'rango/index.html',context=context_dict)
     #return the response back to the user, updating any cookies that need changed
@@ -45,7 +45,12 @@ def about(request):
     # if(request.session.test_cookie_worked()):
     #     print("TEST COOKIE WORKED!")
     #     request.session.delete_test_cookie()
-    return render(request, 'rango/about.html')
+    context_dict={}
+    visitor_cookie_handler(request)
+    context_dict['visits'] = int(request.session['visits'])
+    response = render(request,'rango/about.html',context=context_dict)
+    return response
+    # return render(request, 'rango/about.html')
     # return HttpResponse("Rango says here is the about page.\n <a href='/rango/'>Index</a>")
 
 

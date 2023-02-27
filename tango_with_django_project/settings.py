@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rango',#added as we created an app rango
+    'registration',#django-registration-redux
 ]
 
 MIDDLEWARE = [
@@ -103,6 +104,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#If true, users can register
+REGISTRATION_OPEN = True
+
+# If True, the user will be automatically logged in after registering.
+REGISTRATION_AUTO_LOGIN = True
+
+# The URL that Django redirects users to after logging in.
+LOGIN_REDIRECT_URL = 'rango:index'
+
+# The page users are directed to if they are not logged in.
+# This was set in a previous chapter. The registration package uses this, too.
+LOGIN_URL = 'auth_login'
+
+PASSWORD_CHANGE_URL = 'auth_password_change'
 
 #redirecting to login page for restricted pages
 LOGIN_URL = 'rango:login'

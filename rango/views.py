@@ -9,127 +9,126 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from rango.bing_search import run_query
+from django.views import View
+from django.utils.decorators import method_decorator
 
 
-def index(request):
-    # context_dict = {'boldmessage': 'Crunchy, creamy, cookie, candy, cupcake!'}
-    # return HttpResponse("Rango says Hey there partner!")
-    # return HttpResponse("Rango says hey there partner!\n Rango says here is the 
-    # index page \n  <a href='/rango/about/'>About</a>")
+# def index(request):
+#     # context_dict = {'boldmessage': 'Crunchy, creamy, cookie, candy, cupcake!'}
+#     # return HttpResponse("Rango says Hey there partner!")
+#     # return HttpResponse("Rango says hey there partner!\n Rango says here is the 
+#     # index page \n  <a href='/rango/about/'>About</a>")
 
-    # Query the database for a list of ALL categories currently stored.
-    # Order the categories by the number of likes in descending order.
-    # Retrieve the top 5 only -- or all if less than 5.
-    # Place the list in our context_dict dictionary (with our boldmessage!)
-    # that will be passed to the template engine.
-    category_list = Category.objects.order_by('-likes')[:5]
-    page_list = Page.objects.order_by('-views')[:5]
+#     # Query the database for a list of ALL categories currently stored.
+#     # Order the categories by the number of likes in descending order.
+#     # Retrieve the top 5 only -- or all if less than 5.
+#     # Place the list in our context_dict dictionary (with our boldmessage!)
+#     # that will be passed to the template engine.
+#     category_list = Category.objects.order_by('-likes')[:5]
+#     page_list = Page.objects.order_by('-views')[:5]
 
-    context_dict = {}
-    context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
-    context_dict['categories'] = category_list
-    context_dict['page_views'] = page_list
+#     context_dict = {}
+#     context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
+#     context_dict['categories'] = category_list
+#     context_dict['page_views'] = page_list
     
-    #call the helper function to handle the cookies
-    visitor_cookie_handler(request)
-    # context_dict['visits'] = int(request.session['visits'])
-    #obtain our Response object early so we can add cookie information
-    response = render(request,'rango/index.html',context=context_dict)
-    #return the response back to the user, updating any cookies that need changed
-    return response
+#     #call the helper function to handle the cookies
+#     visitor_cookie_handler(request)
+#     # context_dict['visits'] = int(request.session['visits'])
+#     #obtain our Response object early so we can add cookie information
+#     response = render(request,'rango/index.html',context=context_dict)
+#     #return the response back to the user, updating any cookies that need changed
+#     return response
     
     #render the respsonse and send it back
     # return render(request, 'rango/index.html', context=context_dict)
 
-
-def about(request):
-    # if(request.session.test_cookie_worked()):
-    #     print("TEST COOKIE WORKED!")
-    #     request.session.delete_test_cookie()
-    context_dict={}
-    visitor_cookie_handler(request)
-    context_dict['visits'] = int(request.session['visits'])
-    response = render(request,'rango/about.html',context=context_dict)
-    return response
+# def about(request):
+#     # if(request.session.test_cookie_worked()):
+#     #     print("TEST COOKIE WORKED!")
+#     #     request.session.delete_test_cookie()
+#     context_dict={}
+#     visitor_cookie_handler(request)
+#     context_dict['visits'] = int(request.session['visits'])
+#     response = render(request,'rango/about.html',context=context_dict)
+#     return response
     # return render(request, 'rango/about.html')
     # return HttpResponse("Rango says here is the about page.\n <a href='/rango/'>Index</a>")
 
+# def show_category(request, category_name_slug):
+#     #creating a context dictionary which we will pass to the render engine
+#     context_dict={}
 
-def show_category(request, category_name_slug):
-    #creating a context dictionary which we will pass to the render engine
-    context_dict={}
+#     try:
+#         category= Category.objects.get(slug=category_name_slug)
+#         pages= Page.objects.filter(category=category).order_by('-views')
+#         context_dict['pages']= pages
+#         context_dict['category']=category
+#     except Category.DoesNotExist:
+#         context_dict['category']=None
+#         context_dict['pages']=None
 
-    try:
-        category= Category.objects.get(slug=category_name_slug)
-        pages= Page.objects.filter(category=category).order_by('-views')
-        context_dict['pages']= pages
-        context_dict['category']=category
-    except Category.DoesNotExist:
-        context_dict['category']=None
-        context_dict['pages']=None
+#     result_list = []
+#     if request.method == 'POST':
+#         query = request.POST['query'].strip()
+#         if query:
+#             # Run our Bing function to get the results list!
+#             context_dict['result_list']=run_query(query)
+#             context_dict['query']=query
 
-    result_list = []
-    if request.method == 'POST':
-        query = request.POST['query'].strip()
-        if query:
-            # Run our Bing function to get the results list!
-            context_dict['result_list']=run_query(query)
-            context_dict['query']=query
+#     return render(request, 'rango/category.html', context=context_dict)
 
-    return render(request, 'rango/category.html', context=context_dict)
+# @login_required
+# def add_category(request):
+#     form = CategoryForm()
 
+#     # a HTTP Post
+#     if request.method == 'POST':
+#         form = CategoryForm(request.POST)
 
-@login_required
-def add_category(request):
-    form = CategoryForm()
+#         #have we been provided with a valid form
+#         if form.is_valid():
+#             #save the new category in the database
+#             form.save(commit=True)
+#             # Now that the category is saved, we could confirm this.
+#             # For now, just redirect the user back to the index view.
+#             return redirect('/rango')
+#         else:
+#             #the supplied form contains error-
+#             #just print them in the terminal
+#             print(form.errors)
 
-    # a HTTP Post
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-
-        #have we been provided with a valid form
-        if form.is_valid():
-            #save the new category in the database
-            form.save(commit=True)
-            # Now that the category is saved, we could confirm this.
-            # For now, just redirect the user back to the index view.
-            return redirect('/rango')
-        else:
-            #the supplied form contains error-
-            #just print them in the terminal
-            print(form.errors)
-
-    # Will handle the bad form, new form, or no form supplied cases.
-    # Render the form with error messages (if any).
-    return render(request, 'rango/add_category.html', {'form': form})
+#     # Will handle the bad form, new form, or no form supplied cases.
+#     # Render the form with error messages (if any).
+#     return render(request, 'rango/add_category.html', {'form': form})
 
 
-@login_required
-def add_page(request, category_name_slug):
-    try:
-        category = Category.objects.get(slug=category_name_slug)
-    except Category.DoesNotExist:
-        category = None
+# @login_required
+# def add_page(request, category_name_slug):
+#     try:
+#         category = Category.objects.get(slug=category_name_slug)
+#     except Category.DoesNotExist:
+#         category = None
 
-    if category is None:
-        return redirect('/rango')
+#     if category is None:
+#         return redirect('/rango')
 
-    form =PageForm()
+#     form =PageForm()
 
-    if request.method == 'POST':
-        form = PageForm(request.POST)
-        if form.is_valid():
-            if category:
-                page=form.save(commit=False)
-                page.category=category
-                page.view = 0
-                page.save()
+#     if request.method == 'POST':
+#         form = PageForm(request.POST)
+#         if form.is_valid():
+#             if category:
+#                 page=form.save(commit=False)
+#                 page.category=category
+#                 page.view = 0
+#                 page.save()
 
-                return redirect(reverse('rango:show_category', kwargs={'category_name_slug': category_name_slug}))
-    else:
-        print(form.errors)
-    context_dict={'form': form, 'category': category}
-    return render(request, 'rango/add_page.html', context= context_dict)
+#                 return redirect(reverse('rango:show_category', kwargs={'category_name_slug': category_name_slug}))
+#     else:
+#         print(form.errors)
+#     context_dict={'form': form, 'category': category}
+#     return render(request, 'rango/add_page.html', context= context_dict)
 
 
 # def register(request):
@@ -229,10 +228,10 @@ def add_page(request, category_name_slug):
 #         return render(request, 'rango/login.html')
 
 
-@login_required
-def restricted(request):
-    # return HttpResponse("since you are logged in, you can see this text!")
-    return render(request,'rango/restricted.html')
+# @login_required
+# def restricted(request):
+#     # return HttpResponse("since you are logged in, you can see this text!")
+#     return render(request,'rango/restricted.html')
 
 
 #using login_required decorator to ensure only those logged in can access the logout view
@@ -242,6 +241,196 @@ def restricted(request):
 #     logout(request)
 #     #take the user back to the homepage
 #     return redirect(reverse('rango:index'))
+
+
+# def search(request):
+#     result_list = []
+#     if request.method == 'POST':
+#         query = request.POST['query'].strip()
+#         if query:
+#             # Run our Bing function to get the results list!
+#             result_list=run_query(query)
+
+#     return render(request,'rango/search.html', {'result_list': result_list})
+
+
+# def goto_url(request):
+#     page_id=None
+#     if request.method == 'GET':
+#         page_id = request.GET.get('page_id')
+#         try:
+#             selected_page = Page.objects.get(id=page_id)
+#         except Page.DoesNotExist:
+#             return redirect('rango:index')
+        
+#         selected_page.views = selected_page.views+1
+#         selected_page.save()
+
+#         return redirect(selected_page.url)
+
+
+# @login_required
+# def register_profile(request):
+#     form = UserProfileForm()
+
+
+#     if request.method=='POST':
+#         form = UserProfileForm(request.POST, request.FILES)
+
+#         if form.is_valid:
+#             user_profile=form.save(commit=False)
+#             user_profile.user = request.user
+#             user_profile.save()
+
+#             return redirect(reverse('rango:index'))
+#         else:
+#             print(form.errors)
+        
+#     context_dict={'form':form}
+#     return render(request, 'rango/profile_registration.html', context_dict)
+
+class IndexView(View):
+    def get(self,request):
+        category_list =Category.objects.order_by('-likes')[:5]
+        page_list = Page.objects.order_by('-views')[:5]
+
+        context_dict={}
+        context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
+        context_dict['categories'] = category_list
+        context_dict['page_views'] = page_list
+
+        visitor_cookie_handler(request)
+        
+        return render(request,'rango/index.html', context_dict)
+
+class AboutView(View):
+    def get(self,request):
+        context_dict ={}
+        visitor_cookie_handler(request)
+        context_dict['visits'] = request.session['visits']
+
+        return render(request,'rango/about.html', context_dict)
+
+class ShowCategoryView(View):
+    def get(self,request,category_name_slug):
+        context_dict=self.helper(category_name_slug)
+        return render(request, 'rango/category.html', context_dict)
+    
+    @method_decorator(login_required)
+    def post(self,request,category_name_slug):
+        context_dict=self.helper(category_name_slug)
+        query = request.POST['query'].strip()
+        if query:
+            context_dict['result_list']=run_query(query)
+            context_dict['query']=query
+        
+        return render(request,'rango/category.html',context_dict)
+    
+    def helper(self,category_name_slug):
+        context_dict = {}
+        try:
+            category = Category.objects.get(slug=category_name_slug)
+            pages = Page.objects.filter(category=category).order_by('-views')
+            context_dict['pages']=pages
+            context_dict['category']=category
+        except Category.DoesNotExist:
+            context_dict['pages']=None
+            context_dict['category']=None
+
+        return context_dict
+
+class AddCategoryView(View):
+    @method_decorator(login_required)
+    def get(self, request):
+        form = CategoryForm()
+        return render(request, 'rango/add_category.html', {'form': form})
+    
+    @method_decorator(login_required)
+    def post(self, request):
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect(reverse('rango:index'))
+        else:
+            print(form.errors)
+            return render(request, 'rango/add_category.html', {'form': form})
+
+class AddPageView(View):
+    def helper(self,category_name_slug):
+        try:
+            category = Category.objects.get(slug=category_name_slug)
+        except Category.DoesNotExist:
+            category=None
+        return category
+
+    @method_decorator(login_required)
+    def get(self,request,category_name_slug):
+        category=self.helper(category_name_slug)
+        if category==None:
+            return redirect('/rango')
+        else:
+            form =PageForm()
+            context_dict={'form':form , 'category':category}
+            return render(request, 'rango/add_page.html', context_dict)
+
+    @method_decorator(login_required)
+    def post(self,request,category_name_slug):
+        category = self.helper(category_name_slug)
+        form = PageForm(request.POST)
+        if form.is_valid():
+            if category:
+                page = form.save(commit=False)
+                page.category=category
+                page.view=0
+                page.save()
+
+                return redirect(reverse('rango:show_category',kwargs={'category_name_slug':category_name_slug}))
+        else:
+            print(form.errors)
+        return
+
+
+class RestrictedView(View):
+    @method_decorator(login_required)
+    def get(self,request):
+        return render(request,'rango/restricted.html')
+
+
+class GotoUrlView(View):
+    def get(self,request):
+        page_id=request.GET.get('page_id')
+        try:
+            selected_page = Page.objects.get(id=page_id)
+        except Page.DoesNotExist:
+            return redirect('rango:index')
+        
+        selected_page.views=selected_page.views+1
+        selected_page.save()
+
+        return redirect(selected_page.url)
+
+class RegisterProfileView(View):
+    @method_decorator(login_required)
+    def get(self,request):
+        form = UserProfileForm()
+        context_dict={'form':form}
+        return render(request, 'rango/profile_registration.html', context_dict)
+
+    @method_decorator(login_required)
+    def post(self,request):
+        form =UserProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            user_profile = form.save(commit=False)
+            user_profile.user = request.user
+            user_profile.save()
+
+            return redirect(reverse('rango:index'))
+        else:
+            print(form.errors)
+        return
+        
+
+
 
 def visitor_cookie_handler(request):
     #get the number of visits to the site.
@@ -277,27 +466,4 @@ def get_server_side_cookie(request, cookie, default_val=None):
         val=default_val
     return val
 
-# def search(request):
-#     result_list = []
-#     if request.method == 'POST':
-#         query = request.POST['query'].strip()
-#         if query:
-#             # Run our Bing function to get the results list!
-#             result_list=run_query(query)
-
-#     return render(request,'rango/search.html', {'result_list': result_list})
-
-def goto_url(request):
-    page_id=None
-    if request.method == 'GET':
-        page_id = request.GET.get('page_id')
-        try:
-            selected_page = Page.objects.get(id=page_id)
-        except Page.DoesNotExist:
-            return redirect('rango:index')
-        
-        selected_page.views = selected_page.views+1
-        selected_page.save()
-
-        return redirect(selected_page.url)
 

@@ -68,6 +68,13 @@ Unknown Category
                     <p class="list-group-item-text">
                         {{ result.summary|safe|escape }}
                     </p>
+                    <div id="page-listing">
+                        <button class="btn btn-info btn-sm rango-page-add" type="button"
+                            data-categoryid="{{ category.id }}" data-title="{{ result.title }}"
+                            data-url="{{ result.link }}">
+                            Add
+                        </button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>

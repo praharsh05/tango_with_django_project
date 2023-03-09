@@ -2,7 +2,7 @@ from django.urls import path
 from rango import views
 from rango.views import AboutView, AddCategoryView, IndexView, ShowCategoryView, AddPageView
 from rango.views import RestrictedView, GotoUrlView, RegisterProfileView, ListProfilesView
-from rango.views import LikeCategoryView,CategorySuggestionView
+from rango.views import LikeCategoryView,CategorySuggestionView,SearchAddPageView
 
 app_name='rango'
 urlpatterns= [
@@ -18,7 +18,8 @@ urlpatterns= [
     path('profile/<username>/', views.ProfileView.as_view(), name='profile'),
     path('profiles/',ListProfilesView.as_view(), name='list_profiles'),
     path('like_category/',LikeCategoryView.as_view(),name='like_category'),
-    path('suggest/',CategorySuggestionView.as_view(),name='suggest')
+    path('suggest/',CategorySuggestionView.as_view(),name='suggest'),
+    path('search_add_page/',SearchAddPageView.as_view(),name='search_add_page'),
     # path('register/',views.register,name='register'),
     # path('login/', views.user_login,name='login'),
     # path('logout/', views.user_logout, name='logout'),

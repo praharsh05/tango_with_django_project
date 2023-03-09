@@ -1,11 +1,13 @@
-$(document).ready(function() {
-    alert('Hello, world!');
-});
+// $(document).ready(
+//     // function() {
+//     // alert('Hello, world!');
+//     // }
+// );
 $(document).ready(function() {
     $('#about-btn').click(function() {
         alert('You clicked the button using JQuery!');
     });
-});
+
 $('p').hover(
     function() {
     $(this).css('color', 'red');
@@ -18,3 +20,4 @@ $('#about-btn').click(function() {
     msgStr = msgStr + ' ooo, fancy!';
     $('#msg').html(msgStr);
     });
+});

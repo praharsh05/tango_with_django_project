@@ -479,6 +479,22 @@ class ListProfilesView(View):
         return render(request,'rango/list_profiles.html', context_dict)
 
 
+class LikeCategoryView(View):
+    @method_decorator(login_required)
+    def get(self,request):
+        category_id = request.GET['category_id']
+        try:
+            category= Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return HttpResponse(-1)
+        except ValueError:
+            return HttpResponse(-1)
+        
+        category.likes=category.likes+1
+        category.save()
+
+        return HttpResponse(category.likes)
+
 def visitor_cookie_handler(request):
     #get the number of visits to the site.
     #we use the COOKIES.get() function to obtain the visits cookie

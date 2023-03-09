@@ -1,9 +1,7 @@
-from django.shortcuts import render  # to render pages
+from django.shortcuts import render,redirect  # to render pages
 from django.http import HttpResponse  # to send httpResponse to requests
-from rango.models import Category # to import the categories set in the model
-from rango.models import Page
+from rango.models import Category,Page, UserProfile
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
-from django.shortcuts import redirect
 from django.urls import reverse
 # from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
@@ -11,6 +9,7 @@ from datetime import datetime
 from rango.bing_search import run_query
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
 
 
 # def index(request):
@@ -428,7 +427,49 @@ class RegisterProfileView(View):
         else:
             print(form.errors)
         return
+
+class ProfileView(View):
+    def get_user_detail(self,username):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return None
         
+        user_profile = UserProfile.objects.get_or_create(user=user)[0]
+        form = UserProfileForm({'website':user_profile.website,
+                                'picture':user_profile.picture})
+        return (user,user_profile,form)
+    
+    @method_decorator(login_required)
+    def get(self,request,username):
+        try:
+            (user,user_profile,form) = self.get_user_detail(username)
+        except TypeError:
+            return redirect('rango:index')
+        
+        context_dict={'user_profile':user_profile,
+                      'selected_user':user,
+                      'form':form}
+        return render(request,'rango/profile.html',context_dict)
+    
+    @method_decorator(login_required)
+    def post(self,request,username):
+        try:
+            (user,user_profile,form) = self.get_user_detail(username)
+        except TypeError:
+            return redirect(reverse('rango:index'))
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid:
+            form.save(commit=True)
+            return redirect('rango:profile', user.username)
+        else:
+            print(form.errors)
+
+        context_dict={'user_profile':user_profile,
+                      'selected_user':user,
+                      'form':form}
+        return render(request,'rango/profile.html',context_dict)
+
 
 
 

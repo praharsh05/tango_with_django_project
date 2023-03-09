@@ -14,6 +14,7 @@ urlpatterns= [
     path('restricted/', RestrictedView.as_view(), name='restricted'),
     path('goto/', GotoUrlView.as_view(), name='goto'),
     path('register_profile/', RegisterProfileView.as_view(), name='register_profile'),
+    path('profile/<username>/', views.ProfileView.as_view(), name='profile'),
     # path('register/',views.register,name='register'),
     # path('login/', views.user_login,name='login'),
     # path('logout/', views.user_logout, name='logout'),

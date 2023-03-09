@@ -461,7 +461,7 @@ class ProfileView(View):
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid:
             form.save(commit=True)
-            return redirect('rango:profile', user.username)
+            return redirect('rango:profile', kwargs={'username': username})
         else:
             print(form.errors)
 
@@ -471,6 +471,12 @@ class ProfileView(View):
         return render(request,'rango/profile.html',context_dict)
 
 
+class ListProfilesView(View):
+    @method_decorator(login_required)
+    def get(self, request):
+        profiles = UserProfile.objects.all()
+        context_dict={'user_profile_list':profiles}
+        return render(request,'rango/list_profiles.html', context_dict)
 
 
 def visitor_cookie_handler(request):

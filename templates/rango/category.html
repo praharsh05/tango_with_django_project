@@ -31,9 +31,9 @@ Unknown Category
             {% for page in pages %}
             <li><a href="{% url 'rango:goto'%}?page_id={{page.id}}">{{ page.title }}</a></li>
             {% if page.views > 1 %}
-            ({{page.views}} views)
+            ({{page.views}} views) (last visited: {{page.last_visit}} )
             {% elif page.views == 1 %}
-            ({{page.views}} view)
+            ({{page.views}} view) (last visited: {{page.last_visit}} )
             {% endif %}
             {% endfor %}
         </ul>

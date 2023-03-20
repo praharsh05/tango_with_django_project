@@ -1,6 +1,7 @@
 from django.test import TestCase
-from rango.models import Category
+from rango.models import Category,Page
 from django.urls import reverse
+from django.utils import timezone
 
 # Create your tests here.
 
@@ -55,3 +56,32 @@ def add_category(name, views=0, likes=0):
     category.likes = likes
     category.save()
     return category
+
+
+def add_page(category, title, url):
+    return Page.objects.get_or_create(category=category, title=title, url=url)[0]
+
+class PageViewTests(TestCase):
+    def test_ensure_last_visit_are_not_in_future(self):
+        """
+        Checks whether the last_visit is not in future.
+        """
+        category = add_category('Django', 1, 1)
+        page = Page(category,title='test', url='https://www.test.com',views=0,last_visit=timezone.now())
+        self.assertEqual((page.last_visit < timezone.now()),True)
+    
+    def test_to_ensure_last_visit_is_updated(self):
+        """
+        Checks whether the last_visit is updated or not.
+        """
+        category = add_category('Python', 1, 1)
+        page = add_page(category, 'Documentation', 'https://docs.python.org/3/')
+        created_date = page.last_visit
+
+        # Time WILL pass before this is executed.
+        response = self.client.get(reverse('rango:goto'), {'page_id': page.id})
+
+        # Refresh the model instance.
+        page.refresh_from_db()
+
+        self.assertTrue(page.last_visit > created_date)

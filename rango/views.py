@@ -10,6 +10,7 @@ from rango.bing_search import run_query
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 # def index(request):
@@ -381,6 +382,7 @@ class AddPageView(View):
                 page = form.save(commit=False)
                 page.category=category
                 page.view=0
+                page.last_visit = timezone.now()
                 page.save()
 
                 return redirect(reverse('rango:show_category',kwargs={'category_name_slug':category_name_slug}))
@@ -404,6 +406,8 @@ class GotoUrlView(View):
             return redirect('rango:index')
         
         selected_page.views=selected_page.views+1
+        if selected_page.last_visit < timezone.now():
+            selected_page.last_visit=timezone.now()
         selected_page.save()
 
         return redirect(selected_page.url)

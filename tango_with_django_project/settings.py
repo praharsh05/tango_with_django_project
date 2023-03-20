@@ -22,12 +22,15 @@ MEDIA_DIR=os.path.join(BASE_DIR,'media')
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3cq$qkqerrsr8t%&c-ps2h*4@az+iwj@0l_!6g-k@65rz^67jn'
+key = None
+with open('secret.key') as f:
+    key = f.read().strip()
+SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['praharsh05.pythonanywhere.com']
 
 
 # Application definition
